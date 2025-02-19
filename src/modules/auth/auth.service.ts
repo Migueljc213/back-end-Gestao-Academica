@@ -9,6 +9,8 @@ import { userSelectFields } from '../prisma/utils/userSelectField';
 import { AuthRegisterDTO } from '../domain/dto/authRegister.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { AuthResetPasswordDTO } from '../domain/dto/authResetPassword';
+import { ValidateTokenDTO } from '../domain/dto/validateToken.dto';
+import { AuthForgotDTO } from '../domain/dto/authForgot.dto';
 
 @Injectable()
 export class AuthService {
@@ -18,10 +20,10 @@ export class AuthService {
     private readonly usersService: UsersService,
   ) {}
 
-  async generateJwtToken(user: User) {
+  async generateJwtToken(user: User, expiresIn: string = '1d') {
     const payload = { sub: user.id, name: user.name };
     const options = {
-      expiresIn: '1d',
+      expiresIn: expiresIn,
       issuer: 'dnc_hotel',
       audience: 'users',
     };
@@ -51,13 +53,40 @@ export class AuthService {
 
   async resetPassword({ password, token }: AuthResetPasswordDTO) {
     //recebendo o token, verificando se é valido no sistema
-    const { valid, decoded } = await this.jwtService.verifyAsync(token);
+    const { valid, decoded } = await this.validateToken(token);
     // se não for, retorna um unauthorized
-    if (!valid) throw new UnauthorizedException('Invalid token');
+    if (!valid || decoded == undefined)
+      throw new UnauthorizedException('Invalid token');
     //fazendo o update pegando o id do user do decoded do token
-    const user = await this.usersService.update(decoded.sub, { password });
+    const user = await this.usersService.update(Number(decoded.sub), {
+      password,
+    });
     //gerando um token no fim do processo
     return await this.generateJwtToken(user);
+  }
+
+  async validateToken(token: string): Promise<ValidateTokenDTO> {
+    try {
+      const decoded = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+        issuer: 'dnc_hotel',
+        audience: 'users',
+      });
+
+      return { valid: true, decoded };
+    } catch (error) {
+      return { valid: false, message: error.message };
+    }
+  }
+
+  async forgot(email: string) {
+    const user = await this.findByEmail(email);
+
+    if (!user) throw new UnauthorizedException('Email not found');
+
+    const token = await this.generateJwtToken(user, '30min');
+
+    return token;
   }
 
   async findByEmail(email: string) {
