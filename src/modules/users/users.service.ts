@@ -12,25 +12,20 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(body: CreateUserDto): Promise<User> {
-    try {
-      const emailExist = await this.prisma.user.findUnique({
-        where: { email: body.email },
-      });
+    const emailExist = await this.prisma.user.findUnique({
+      where: { email: body.email },
+    });
 
-      if (emailExist) {
-        console.log('E-mail já cadastrado! Lançando erro.');
-        throw new UnauthorizedException('Email already exists');
-      }
-
-      body.password = await this.hashPassword(body.password);
-
-      return await this.prisma.user.create({
-        data: body,
-        select: userSelectFields,
-      });
-    } catch (error) {
-      throw new Error(error.message);
+    if (emailExist) {
+      throw new UnauthorizedException('Email already exists');
     }
+
+    body.password = await this.hashPassword(body.password);
+
+    return await this.prisma.user.create({
+      data: body,
+      select: userSelectFields,
+    });
   }
 
   findAll() {
@@ -44,6 +39,15 @@ export class UsersService {
 
   async update(id: number, body: UpdateUserDto) {
     await this.isIdExits(id);
+
+    if (body.email) {
+      const emailExist = await this.prisma.user.findUnique({
+        where: { email: body.email },
+      });
+      if (emailExist) {
+        throw new UnauthorizedException('Email already exists');
+      }
+    }
 
     if (body.password) {
       body.password = await this.hashPassword(body.password);
