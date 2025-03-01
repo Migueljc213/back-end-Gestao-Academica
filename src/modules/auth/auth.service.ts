@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -11,6 +15,7 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { AuthResetPasswordDTO } from '../domain/dto/authResetPassword';
 import { ValidateTokenDTO } from '../domain/dto/validateToken.dto';
 import { AuthForgotDTO } from '../domain/dto/authForgot.dto';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +23,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
     private readonly usersService: UsersService,
+    private readonly mailerService: MailerService,
   ) {}
 
   async generateJwtToken(user: User, expiresIn: string = '1d') {
@@ -90,6 +96,12 @@ export class AuthService {
     if (!user) throw new UnauthorizedException('Email not found');
 
     const token = await this.generateJwtToken(user, '30min');
+
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Reset Password',
+      html: `<a href="http://localhost:3000/reset-password?token=${token.access_token}">Click here to reset your password</a>`,
+    })
 
     return token;
   }

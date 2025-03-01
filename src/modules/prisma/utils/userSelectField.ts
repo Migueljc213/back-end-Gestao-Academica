@@ -4,6 +4,7 @@ export const userSelectFields = {
   password: false,
   email: true,
   role: true,
+  avatar: true,
   created_at: true,
   updated_at: false,
 };

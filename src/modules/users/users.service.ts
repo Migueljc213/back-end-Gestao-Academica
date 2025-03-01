@@ -6,6 +6,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundError } from 'rxjs';
 import * as bcrypt from 'bcrypt';
 import { userSelectFields } from '../prisma/utils/userSelectField';
+import { join, resolve } from 'path';
+import { stat, unlink } from 'fs/promises';
 
 @Injectable()
 export class UsersService {
@@ -60,6 +62,24 @@ export class UsersService {
     return user;
   }
 
+  async uploadAvatar(id: number, avatarFilename: string) {
+    const user = await this.isIdExits(id);
+    const directory = resolve(__dirname, '..', '..', '..', 'uploads');
+
+    if (user.avatar) {
+      const userAvatarFilePath = join(directory, user.avatar);
+      const userAvatarFileExists = await stat(userAvatarFilePath);
+
+      if (userAvatarFileExists) {
+        await unlink(userAvatarFilePath);
+      }
+    }
+
+    const userUpdated = await this.update(id, { avatar: avatarFilename });
+
+    return userUpdated;
+  }
+
   async remove(id: number) {
     const user = this.isIdExits(id);
     return await this.prisma.user.delete({
@@ -68,15 +88,15 @@ export class UsersService {
     });
   }
 
-  isIdExits(id: number) {
-    const user = this.prisma.user.findFirst({
+  async isIdExits(id: number) {
+    const user = await this.prisma.user.findFirst({
       where: { id: id },
       select: userSelectFields,
     });
     if (!user) {
       throw new NotFoundError('Not found user');
     }
-
+    console.log(user);
     return user;
   }
 
