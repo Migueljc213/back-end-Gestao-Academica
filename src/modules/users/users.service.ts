@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundError } from 'rxjs';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { userSelectFields } from '../prisma/utils/userSelectField';
 
 @Injectable()
@@ -12,11 +12,25 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(body: CreateUserDto): Promise<User> {
-    body.password = await this.hashPassword(body.password);
-    return await this.prisma.user.create({
-      data: body,
-      select: userSelectFields,
-    });
+    try {
+      const emailExist = await this.prisma.user.findUnique({
+        where: { email: body.email },
+      });
+
+      if (emailExist) {
+        console.log('E-mail já cadastrado! Lançando erro.');
+        throw new UnauthorizedException('Email already exists');
+      }
+
+      body.password = await this.hashPassword(body.password);
+
+      return await this.prisma.user.create({
+        data: body,
+        select: userSelectFields,
+      });
+    } catch (error) {
+      throw new Error(error.message);
+    }
   }
 
   findAll() {

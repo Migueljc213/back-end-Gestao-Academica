@@ -1,9 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthLoginDTO } from '../domain/dto/authLogin.dto';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { userSelectFields } from '../prisma/utils/userSelectField';
 import { AuthRegisterDTO } from '../domain/dto/authRegister.dto';
@@ -33,6 +33,7 @@ export class AuthService {
 
   async login({ email, password }: AuthLoginDTO) {
     const user = await this.findByEmail(email);
+    console.log(user);
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Email or password is incorrect');
     }
@@ -40,6 +41,10 @@ export class AuthService {
   }
 
   async register(body: AuthRegisterDTO) {
+    const emailExists = await this.prisma.user.findUnique({
+      where: { email: body.email },
+    });
+    if (emailExists) throw new ConflictException('Email already exists');
     const newUser: CreateUserDto = {
       email: body.email,
       name: body.name,
@@ -92,7 +97,6 @@ export class AuthService {
   async findByEmail(email: string) {
     return await this.prisma.user.findUnique({
       where: { email },
-      select: userSelectFields,
     });
   }
 }
