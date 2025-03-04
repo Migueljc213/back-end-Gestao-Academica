@@ -19,14 +19,38 @@ enum Role {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
+  id         Int            @id @default(autoincrement())
   name       String
-  email      String   @unique
+  email      String         @unique
   password   String
-  role       Role     @default(USER)
+  role       Role           @default(USER)
   avatar     String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  created_at DateTime       @default(now())
+  updated_at DateTime       @updatedAt
+  grupos     UserGrupo[]
 
   @@map("users")
+}
+
+model Sistema {
+  id     String  @id @default(uuid())
+  nome   String  @unique
+  grupos Grupo[]
+}
+
+model Grupo {
+  id        String         @id @default(uuid())
+  nome      String
+  sistemaId String
+  sistema   Sistema        @relation(fields: [sistemaId], references: [id])
+  usuarios  UserGrupo[]
+}
+
+model UserGrupo {
+  userId  Int
+  grupoId String
+  usuario User   @relation(fields: [userId], references: [id])
+  grupo   Grupo  @relation(fields: [grupoId], references: [id])
+
+  @@id([userId, grupoId]) 
 }

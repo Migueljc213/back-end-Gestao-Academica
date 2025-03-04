@@ -23,7 +23,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
     private readonly usersService: UsersService,
-    private readonly mailerService: MailerService,
+    // private readonly mailerService: MailerService,
   ) {}
 
   async generateJwtToken(user: User, expiresIn: string = '1d') {
@@ -39,7 +39,7 @@ export class AuthService {
 
   async login({ email, password }: AuthLoginDTO) {
     const user = await this.findByEmail(email);
-    console.log(user);
+
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Email or password is incorrect');
     }
@@ -97,11 +97,11 @@ export class AuthService {
 
     const token = await this.generateJwtToken(user, '30min');
 
-    await this.mailerService.sendMail({
-      to: user.email,
-      subject: 'Reset Password',
-      html: `<a href="http://localhost:3000/reset-password?token=${token.access_token}">Click here to reset your password</a>`,
-    })
+    // await this.mailerService.sendMail({
+    //   to: user.email,
+    //   subject: 'Reset Password',
+    //   html: `<a href="http://localhost:3000/reset-password?token=${token.access_token}">Click here to reset your password</a>`,
+    // })
 
     return token;
   }
