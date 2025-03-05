@@ -15,21 +15,24 @@ import { uuid } from 'uuidv4';
 import { diskStorage } from 'multer';
 
 @Module({
-  imports: [PrismaModule, forwardRef(() => AuthModule),
+  imports: [
+    PrismaModule,
+    forwardRef(() => AuthModule),
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
           const filename = `${uuid()}${file.originalname}`;
           return cb(null, filename);
-        }
-      })
-    })
+        },
+      }),
+    }),
   ],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],
 })
+//Usando um middleware
 export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(UserIdCheckMiddleware).forRoutes(

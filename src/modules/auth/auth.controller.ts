@@ -7,10 +7,10 @@ import {
   Post,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthLoginDTO } from '../domain/dto/authLogin.dto';
-import { AuthRegisterDTO } from '../domain/dto/authRegister.dto';
-import { AuthResetPasswordDTO } from '../domain/dto/authResetPassword';
-import { AuthForgotDTO } from '../domain/dto/authForgot.dto';
+import { AuthLoginDTO } from './domain/dto/authLogin.dto';
+import { AuthRegisterDTO } from './domain/dto/authRegister.dto';
+import { AuthResetPasswordDTO } from './domain/dto/authResetPassword';
+import { AuthForgotDTO } from './domain/dto/authForgot.dto';
 
 @Controller('auth')
 export class AuthController {

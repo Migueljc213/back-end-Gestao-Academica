@@ -24,10 +24,24 @@ export class UsersService {
 
     body.password = await this.hashPassword(body.password);
 
-    return await this.prisma.user.create({
-      data: body,
+    const user = await this.prisma.user.create({
+      data: {
+        name: body.name,
+        password: body.password,
+        avatar: body.avatar,
+        email: body.email,
+        grupos: {
+          create: {
+            grupo: {
+              connect: { id: '38ab250f-88ce-4af9-bf2f-29fbd9e270c0' },
+            },
+          },
+        },
+      },
       select: userSelectFields,
     });
+
+    return user;
   }
 
   findAll() {

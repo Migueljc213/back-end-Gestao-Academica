@@ -6,15 +6,15 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { AuthLoginDTO } from '../domain/dto/authLogin.dto';
+import { AuthLoginDTO } from './domain/dto/authLogin.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { userSelectFields } from '../prisma/utils/userSelectField';
-import { AuthRegisterDTO } from '../domain/dto/authRegister.dto';
+import { AuthRegisterDTO } from './domain/dto/authRegister.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { AuthResetPasswordDTO } from '../domain/dto/authResetPassword';
-import { ValidateTokenDTO } from '../domain/dto/validateToken.dto';
-import { AuthForgotDTO } from '../domain/dto/authForgot.dto';
+import { AuthResetPasswordDTO } from './domain/dto/authResetPassword';
+import { ValidateTokenDTO } from './domain/dto/validateToken.dto';
+import { AuthForgotDTO } from './domain/dto/authForgot.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
@@ -55,7 +55,6 @@ export class AuthService {
       email: body.email,
       name: body.name,
       password: body.password,
-      role: body.role,
     } as CreateUserDto;
     const user = await this.usersService.create(newUser);
 

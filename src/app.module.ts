@@ -4,6 +4,7 @@ import { PrismaModule } from './modules/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { AlunosModule } from './modules/alunos/alunos.module';
 import 'dotenv/config';
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import 'dotenv/config';
         limit: 3,
       },
     ]),
+    AlunosModule,
     // MailerModule.forRoot({
     //   transport: process.env.SMTP,
     //   defaults: {
