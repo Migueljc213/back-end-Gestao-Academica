@@ -11,7 +11,7 @@ export default class UpdateAlunoService {
     private readonly alunoRespositories: IAlunoRepository,
   ) {}
 
-  async execute(updateAlunoDto: UpdateAlunoDto) {
-    return await this.alunoRespositories.updateAluno(updateAlunoDto);
+  async execute(id:number, updateAlunoDto: UpdateAlunoDto) {
+    return await this.alunoRespositories.updateAluno(id, updateAlunoDto);
   }
 }

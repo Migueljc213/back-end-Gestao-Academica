@@ -6,7 +6,7 @@ export interface IAlunoRepository {
   createAluno(data: CreateAlunoDto): Promise<Aluno>;
   findAluno(id: number): Promise<Aluno | null>;
   findAlunos(): Promise<Aluno[] | null>;
-  updateAluno(data: UpdateAlunoDto): Promise<Aluno>;
+  updateAluno(id, data: UpdateAlunoDto): Promise<Aluno>;
   deleteAluno(id: number): Promise<Aluno>;
   findAlunoByUserId(userId: number): Promise<Aluno | null>;
 }
