@@ -5,6 +5,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { AlunosModule } from './modules/alunos/alunos.module';
+import { ProfessorModule } from './modules/professor/professor.module';
+
 import 'dotenv/config';
 @Module({
   imports: [
@@ -18,6 +20,7 @@ import 'dotenv/config';
       },
     ]),
     AlunosModule,
+    ProfessorModule,
     // MailerModule.forRoot({
     //   transport: process.env.SMTP,
     //   defaults: {
