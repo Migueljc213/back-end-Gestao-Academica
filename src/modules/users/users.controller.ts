@@ -11,6 +11,7 @@ import {
   ParseFilePipe,
   FileTypeValidator,
   MaxFileSizeValidator,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -37,8 +38,8 @@ export class UsersController {
 
   @Grupo('ADMIN')
   @Get()
-  findAll(@User('') req) {
-    return this.usersService.findAll();
+  findAll(@Query('page') page: string = '1', @Query('limit') limit: string = '10') {
+    return this.usersService.findAll(Number(page), Number(limit));
   }
 
   @Get(':id')

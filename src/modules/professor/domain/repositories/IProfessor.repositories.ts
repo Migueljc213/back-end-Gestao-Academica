@@ -5,7 +5,8 @@ import { CreateProfessorDto } from '../dto/create-professor.dto';
 export interface IProfessorRepository {
   createProfessor(data: CreateProfessorDto): Promise<Professor>;
   findProfessor(id: number): Promise<Professor>;
-  findProfessores(): Promise<Professor | null>;
+  findProfessores(offset: number, limit: number): Promise<Professor | null>;
+  countHotels(): Promise<number>;
   updateProfessor(
     id: number,
     data: UpdateProfessorDto,

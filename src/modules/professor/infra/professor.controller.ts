@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { CreateProfessorDto } from '../domain/dto/create-professor.dto';
 import { UpdateProfessorDto } from '../domain/dto/update-professor.dto';
@@ -32,8 +33,8 @@ export class ProfessorController {
   }
 
   @Get()
-  findAll() {
-    return this.findProfessoresService.execute();
+  findAll(@Query('page') page: string = '1', @Query('limit') limit: string = '10') {
+    return this.findProfessoresService.execute(Number(page), Number(limit));
   }
 
   @Get(':id')

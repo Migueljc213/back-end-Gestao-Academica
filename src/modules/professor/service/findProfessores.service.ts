@@ -10,7 +10,17 @@ export class FindProfessoresService {
     private readonly professorRepository: IProfessorRepository,
   ) {}
 
-  async execute() {
-    return await this.professorRepository.findProfessores();
+  async execute(page: number = 1, limit: number = 10) {
+    const offset = (page - 1) * limit;
+    const data = await this.professorRepository.findProfessores(offset, limit);
+    const total = await this.professorRepository.countHotels()
+
+
+    return { 
+      data,
+      total,
+      page,
+      per_page: limit
+    }
   }
 }

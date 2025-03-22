@@ -44,8 +44,20 @@ export class UsersService {
     return user;
   }
 
-  findAll() {
-    return this.prisma.user.findMany({ select: userSelectFields });
+  async findAll(page: number = 1, limit: number = 10) {
+    const offset = (page - 1) * limit;
+    
+    const data = await this.prisma.user.findMany({
+      take: limit,
+      skip: offset,
+      select: userSelectFields,
+    });
+
+    return {
+      data,
+      page, 
+      per_page: limit
+    }
   }
 
   findOne(id: number) {

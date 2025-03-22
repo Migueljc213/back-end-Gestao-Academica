@@ -1,0 +1,1 @@
+export const REDIS_ALUNO_KEY = 'find-all-alunos';
